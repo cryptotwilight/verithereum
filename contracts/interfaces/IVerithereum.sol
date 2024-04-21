@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.2 <0.9.0;
+pragma solidity >=0.7.0 <0.9.0;
 
-import {GiltVerification, Gilt} from "./IVerithereumStructs.sol";
+import {Gilt, GiltVerificationProof} from "./IVStructs.sol";
 
-interface IVerithereum  { 
+interface IVerithereum {
 
-    function getGiltVerificationIds() view external returns (uint256 [] memory _ids);
+    function verify(Gilt memory _gilt) external returns (GiltVerificationProof memory _gvp);
 
-    function verify(Gilt memory _gilt) external returns (GiltVerification memory _giltVerification);
+    function getGVPIds() view external returns (uint256 [] memory _ids);
 
-    function getGiltverification(uint256 _giltVerificationId) view external returns (GiltVerification memory _giltVerification);
-
+    function getGiltVerificationProof(uint256 _gvpId) external returns (GiltVerificationProof memory _gvp);
 
 }

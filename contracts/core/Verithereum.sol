@@ -1,42 +1,75 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.2 <0.9.0;
+pragma solidity >=0.7.0 <0.9.0;
 
 import "../interfaces/IVerithereum.sol";
-import "../interfaces/IVRegister.sol";
-import "https://github.com/EthSign/sign-protocol-evm/blob/main/src/interfaces/ISP.sol";
+import "../interfaces/IVversion.sol";
+import "../interfaces/IVeriRegister.sol";
 
+import { Attestation } from "@ethsign/sign-protocol-evm/src/models/Attestation.sol";
+import { DataLocation } from "@ethsign/sign-protocol-evm/src/models/DataLocation.sol";
+import { ISP } from "@ethsign/sign-protocol-evm/src/interfaces/ISP.sol";
 
-contract Verithereum is IVerithereum, IVversion { 
+contract Verithereum is IVerithereum, IVversion {
 
-    string constant name = "RESERVED_VERITHEREUM";
+    modifier adminOnly {
+        require(msg.sender == register.getAddress(ADMIN), "admin only");
+        _;
+    }
+
+    string constant name = "RESERVED_VERITHEREUM_CORE";
     uint256 constant version = 1; 
 
-    string constant SIGN_PROTOCOL = "RESERVED_SIGN_PROTOCOL_ISP";
+    string constant SIGN_PROTOCOL = "RESERVED_SIGN_PROTOCOL";
+    string constant ADMIN = "RESERVED_VERI_ADMIN";
+    string constant REGISTER = "RESERVED_VERI_REGISTER";
 
-    IVRegister register; 
-    ISP isp; 
-    uint256 [] verificationIds;
-    mapping(uint256=>GiltVerification) giltVerificationById; 
+    IVeriRegister register; 
+    ISP signProtocol;
+
+    uint256 [] gvpIds; 
+    mapping(uint256=>GiltVerificationProof) proofById; 
 
     constructor(address _register) {
-        register = IVRegister(_register);
-        isp = ISP(register.getAddress(SIGN_PROTOCOL));
+        register = IVeriRegister(_register);
+        initialize(); 
     }
 
-    function getGiltVerificationIds() view external returns (uint256 [] memory _ids){
-        return verificationIds; 
+    function getName() pure external returns (string memory _name){
+        return name; 
     }
 
-    function verify(Gilt memory _gilt) external returns (GiltVerification memory _giltVerification){
-        Attestation memory attestation_ = isp.getAttestation(_gilt.attestationId);
-        // get the rest
+    function getVersion() pure external returns (uint256 _version){
+        return version; 
+    }
+
+    function getGVPIds() view external returns (uint256 [] memory _ids){
+        return gvpIds; 
+    }
+
+    function getGiltVerificationProof(uint256 _gvpId) view external returns (GiltVerificationProof memory _gvp){
+        return proofById[_gvpId];
+    }
+
+    function verify(Gilt memory _gilt) external returns (GiltVerificationProof memory _gvp){
+        Attestation memory 
+
 
     }
 
-    function getGiltverification(uint256 _giltVerificationId) view external returns (GiltVerification memory _giltVerification){
-        return giltVerificationById[_giltVerificationId];
+    function notifyChangeOfAddress() external adminOnly returns (bool _acknowledged) {
+        register = IVeriRegister(register.getAddress(REGISTER));
+        initialize(); 
+        return true; 
     }
+
+//================================= INTERNAL =====================================================
+
+    function initialize() internal returns (bool _initialized){
+        signProtocol = ISP(register.getAddress(SIGN_PROTOCOL));
+        return true; 
+    }
+
 
 
 }
